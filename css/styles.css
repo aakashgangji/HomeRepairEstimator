@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  /* Prevent pull-to-refresh on mobile for a native feel */
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar for category tabs */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Micro-animations */
+.flash-update {
+  animation: flash 0.5s ease-out;
+}
+
+@keyframes flash {
+  0% { color: #f59e0b; transform: scale(1.05); }
+  100% { color: inherit; transform: scale(1); }
+}
+
+.slide-up-enter {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Checkbox/Radio styling if needed */
+.custom-checkbox:checked + div {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.custom-checkbox:checked + div svg {
+  display: block;
+}

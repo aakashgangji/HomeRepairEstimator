@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Spark Homes Repair Estimator</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f8fafc">
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+              900: '#7c2d12'
+            },
+            slate: {
+              50: '#fafafa',
+              100: '#f5f5f5',
+              200: '#e5e5e5',
+              300: '#d4d4d4',
+              400: '#a3a3a3',
+              500: '#737373',
+              600: '#525252',
+              700: '#404040',
+              800: '#262626',
+              900: '#171717'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 h-screen flex flex-col overflow-hidden transition-colors duration-300">
+  
+  <!-- Tailwind CDN Safelist for dynamically injected classes in app.js -->
+  <div class="hidden bg-primary-50 dark:bg-primary-900/20 bg-white dark:bg-slate-800 text-primary-900 dark:text-primary-400 text-slate-700 dark:text-slate-200 text-primary-600 dark:text-primary-300 font-medium text-slate-400 dark:text-slate-500 text-primary-700 text-slate-300 dark:text-slate-600"></div>
+
+
+  <header class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 z-50 shrink-0 transition-colors duration-300">
+    <div class="px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center gap-2">
+      <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+        <button id="btn-back" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 mr-1 p-1 hidden shrink-0"><i class="fas fa-chevron-left text-lg sm:text-xl"></i></button>
+        <img src="Spark Group - Logo.png" alt="Spark Logo" class="h-6 sm:h-8 object-contain hidden sm:block bg-white rounded shrink-0">
+        <div class="min-w-0 flex flex-col justify-center">
+          <button id="btn-projects" class="flex items-center space-x-1 sm:space-x-2 text-slate-800 dark:text-slate-100 hover:text-primary-600 dark:hover:text-primary-500 transition-colors w-full text-left">
+            <i class="fas fa-folder-open text-primary-600 dark:text-primary-500 shrink-0 text-sm sm:text-base"></i>
+            <h1 class="font-bold text-base sm:text-lg leading-tight truncate" id="project-name-display">Loading...</h1>
+            <i class="fas fa-chevron-down text-[10px] sm:text-xs text-slate-400 shrink-0"></i>
+          </button>
+          <div class="flex flex-col items-start mt-0.5">
+            <p class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase shrink-0">Repair Estimator</p>
+            <button id="btn-edit-location" class="text-[9px] sm:text-[10px] text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors flex items-center space-x-1 truncate max-w-[150px] sm:max-w-[250px] mt-0.5" title="Edit Location">
+              <i class="fas fa-map-marker-alt shrink-0"></i> 
+              <span id="project-location-display" class="truncate">Add Location</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="text-right flex items-center space-x-1 sm:space-x-3 shrink-0">
+        <button id="btn-settings" class="text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-500 flex items-center justify-center active:scale-95 transition-transform w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+          <i class="fas fa-cog text-base sm:text-lg"></i>
+        </button>
+        <button id="btn-save" class="text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-500 flex items-center justify-center active:scale-95 transition-transform relative hidden w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+          <i class="fas fa-save text-base sm:text-lg"></i>
+          <div id="save-toast" class="absolute -bottom-8 bg-slate-800 dark:bg-slate-100 dark:text-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-lg opacity-0 transition-opacity pointer-events-none whitespace-nowrap z-50">Saved!</div>
+        </button>
+        <div class="flex flex-col items-end shrink-0 pl-1">
+          <div class="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider">Est. Total</div>
+          <div id="sticky-total" class="text-lg sm:text-2xl font-black text-primary-600 dark:text-primary-500 tabular-nums transition-all duration-300">$0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="bg-slate-200 dark:bg-slate-700 h-1.5 w-full shrink-0">
+      <div id="progress-bar" class="bg-primary-500 dark:bg-primary-500 h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+    </div>
+
+    <!-- Category Navigation (Tabs) -->
+    <nav class="border-b border-slate-200 dark:border-slate-700 shrink-0 z-40 transition-colors duration-300" id="tabs-container-wrapper">
+      <ul class="flex overflow-x-auto hide-scrollbar px-2" id="category-tabs">
+        <!-- Tabs will be injected by JS -->
+      </ul>
+    </nav>
+
+    <!-- Persistent Section Total -->
+    <div id="section-total-persistent" class="hidden px-4 py-2.5 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0 flex justify-between items-center shadow-sm z-10 transition-colors duration-300">
+      <span id="persistent-section-name" class="font-black text-slate-800 dark:text-slate-300 uppercase tracking-widest text-xs"></span>
+      <span id="persistent-section-total" class="font-black text-primary-600 dark:text-primary-500 text-lg"></span>
+    </div>
+  </header>
+
+
+  <!-- Search Bar -->
+  <div class="bg-white dark:bg-slate-800 px-4 py-2 border-b border-slate-200 dark:border-slate-700 shrink-0 flex items-center transition-colors duration-300" id="search-bar-container">
+    <div class="relative w-full">
+      <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+      <input type="text" id="search-input" placeholder="Search line items..." class="w-full bg-slate-100 dark:bg-slate-900 dark:text-white text-sm rounded-lg pl-9 pr-4 py-2 border-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-all outline-none">
+    </div>
+  </div>
+
+  <!-- Category Navigation (Tabs) -->
+  <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0 z-40 transition-colors duration-300" id="tabs-container-wrapper">
+    <ul class="flex overflow-x-auto hide-scrollbar px-2" id="category-tabs">
+      <!-- Tabs will be injected by JS -->
+    </ul>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-y-auto pb-24 relative" id="main-content">
+    <div class="max-w-3xl mx-auto w-full p-4" id="rooms-container">
+      <!-- Room blocks and repair items will be injected here -->
+      <div class="flex justify-center items-center h-full text-slate-400 mt-20">
+        <i class="fas fa-spinner fa-spin text-2xl"></i>
+      </div>
+    </div>
+  </main>
+
+  <!-- Global Action Bar (Footer) -->
+  <div class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-100 dark:from-slate-900 to-transparent pointer-events-none flex justify-between items-end z-50 space-x-2" id="global-footer">
+    <div class="flex space-x-2 pointer-events-auto">
+      <button id="btn-camera" class="bg-white dark:bg-slate-800 dark:text-slate-100 text-slate-700 shadow-md border border-slate-200 dark:border-slate-700 rounded-full w-12 h-12 flex items-center justify-center text-lg active:scale-95 transition-transform" title="Take Global Project Photo">
+        <i class="fas fa-camera"></i>
+      </button>
+      <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+    </div>
+  </div>
+
+  <!-- Welcome Screen Overlay -->
+  <div id="welcome-screen" class="fixed inset-0 bg-slate-50 dark:bg-slate-900 z-[200] flex flex-col items-center p-6 text-slate-800 dark:text-white transition-opacity duration-300 overflow-y-auto hide-scrollbar">
+    <div class="max-w-md w-full flex flex-col items-center my-auto py-10">
+      <img src="Spark Group - Logo.png" alt="Spark Logo" class="h-16 object-contain mb-8 bg-white p-2 rounded-xl shadow">
+      <h2 class="text-3xl font-black mb-2 text-center text-slate-900 dark:text-white">Welcome to Spark</h2>
+      <p class="text-slate-500 dark:text-slate-400 mb-10 text-center text-sm">Create a new walkthrough or continue an existing project.</p>
+      
+      <button id="welcome-btn-new" class="w-full bg-primary-600 text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-primary-500 transition-colors mb-8 shrink-0">
+        <i class="fas fa-plus mr-2"></i> New Project
+      </button>
+
+      <div class="w-full shrink-0">
+        <h3 class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Recent Projects</h3>
+        <div id="welcome-projects-list" class="space-y-2 pb-10">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 bg-slate-900/50 z-[100] hidden flex flex-col justify-end sm:justify-center sm:p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl flex flex-col max-h-[85vh] transition-colors duration-300">
+      <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-lg dark:text-white">Settings</h3>
+        <button id="close-settings" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto hide-scrollbar flex-1 space-y-6">
+        
+        <div>
+          <h4 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Appearance</h4>
+          <div class="flex space-x-2 bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
+            <button class="theme-btn flex-1 py-2 text-sm font-semibold rounded-md transition-colors" data-theme="light"><i class="fas fa-sun mr-2"></i>Light</button>
+            <button class="theme-btn flex-1 py-2 text-sm font-semibold rounded-md transition-colors" data-theme="dark"><i class="fas fa-moon mr-2"></i>Dark</button>
+            <button class="theme-btn flex-1 py-2 text-sm font-semibold rounded-md transition-colors" data-theme="system"><i class="fas fa-desktop mr-2"></i>System</button>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Custom Pricing Engine</h4>
+          <p class="text-xs text-slate-400 dark:text-slate-500 mb-3">Override default unit prices. Upload a new Pricing List CSV or edit manually.</p>
+          
+          <div class="flex space-x-2 mb-3">
+            <button id="btn-upload-csv" class="flex-1 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800 rounded-lg py-2 text-sm font-bold hover:bg-primary-100 transition-colors">
+              <i class="fas fa-upload mr-2"></i>Upload CSV
+            </button>
+            <input type="file" id="pricing-csv-input" accept=".csv" class="hidden">
+            
+            <button id="btn-manual-pricing" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-lg py-2 text-sm font-bold hover:bg-slate-200 transition-colors">
+              <i class="fas fa-edit mr-2"></i>Edit Manually
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Pricing Edit Modal -->
+  <div id="pricing-modal" class="fixed inset-0 bg-slate-900/50 z-[110] hidden flex flex-col justify-end sm:justify-center sm:p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl flex flex-col max-h-[85vh] transition-colors duration-300">
+      <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-lg dark:text-white">Edit Base Prices</h3>
+        <button id="close-pricing-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="bg-slate-100 dark:bg-slate-900 px-4 py-2 border-b border-slate-200 dark:border-slate-700 shrink-0">
+        <input type="text" id="pricing-search" placeholder="Search to edit..." class="w-full bg-white dark:bg-slate-800 dark:text-white text-sm rounded pl-3 pr-3 py-2 border border-slate-200 dark:border-slate-600 focus:outline-none">
+      </div>
+      <div class="p-0 overflow-y-auto hide-scrollbar flex-1" id="pricing-editor-list">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Modal -->
+  <div id="projects-modal" class="fixed inset-0 bg-slate-900/50 z-[100] hidden flex flex-col justify-end sm:justify-center sm:p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl flex flex-col max-h-[85vh] transition-colors duration-300">
+      <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-lg dark:text-white">My Projects</h3>
+        <button id="close-projects" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto hide-scrollbar flex-1">
+        <button id="btn-new-project" class="w-full py-3 mb-4 border-2 border-dashed border-primary-300 dark:border-primary-700 rounded-xl text-primary-600 dark:text-primary-500 font-semibold hover:bg-primary-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center space-x-2">
+          <i class="fas fa-plus"></i><span>Create New Project</span>
+        </button>
+        <div id="projects-list" class="space-y-2">
+          <!-- Projects list injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photos Modal -->
+  <div id="photos-modal" class="fixed inset-0 bg-slate-900/50 z-[100] hidden flex flex-col justify-end sm:justify-center sm:p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl flex flex-col max-h-[85vh] transition-colors duration-300">
+      <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-lg dark:text-white">Project Photos</h3>
+        <button id="close-photos" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div id="photos-grid" class="p-4 grid grid-cols-3 gap-2 overflow-y-auto hide-scrollbar flex-1">
+        <!-- Thumbnails injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- New Project Modal -->
+  <div id="new-project-modal" class="fixed inset-0 bg-slate-900/50 z-[250] hidden flex flex-col justify-center items-center p-4 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden transition-colors duration-300">
+      <div class="p-5">
+        <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-4">Create New Project</h3>
+        
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Project Name</label>
+        <input type="text" id="new-project-name" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4" placeholder="Enter project name...">
+        
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Location / Address</label>
+        <div class="flex space-x-2">
+          <input type="text" id="new-project-location" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Enter or fetch location...">
+          <button id="btn-fetch-location" class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors" title="Get Current Location">
+            <i class="fas fa-location-arrow"></i>
+          </button>
+        </div>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-900/50 px-5 py-3 flex justify-end space-x-2 border-t border-slate-100 dark:border-slate-700">
+        <button id="new-project-cancel" class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+        <button id="new-project-confirm" class="px-4 py-2 text-sm font-bold bg-primary-600 dark:bg-primary-800 text-white rounded-lg shadow hover:bg-primary-500">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Project Modal -->
+  <div id="edit-project-modal" class="fixed inset-0 bg-slate-900/50 z-[250] hidden flex flex-col justify-center items-center p-4 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden transition-colors duration-300">
+      <div class="p-5">
+        <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-4">Edit Project Details</h3>
+        
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Project Name</label>
+        <input type="text" id="edit-project-name" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 mb-4" placeholder="Enter project name...">
+        
+        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Location / Address</label>
+        <div class="flex space-x-2">
+          <input type="text" id="edit-project-location" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Enter or fetch location...">
+          <button id="btn-edit-fetch-location" class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors" title="Get Current Location">
+            <i class="fas fa-location-arrow"></i>
+          </button>
+        </div>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-900/50 px-5 py-3 flex justify-end space-x-2 border-t border-slate-100 dark:border-slate-700">
+        <button id="edit-project-cancel" class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+        <button id="edit-project-confirm" class="px-4 py-2 text-sm font-bold bg-primary-600 dark:bg-primary-800 text-white rounded-lg shadow hover:bg-primary-500">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Input Modal -->
+  <div id="input-modal" class="fixed inset-0 bg-slate-900/50 z-[250] hidden flex flex-col justify-center items-center p-4 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden transition-colors duration-300">
+      <div class="p-5">
+        <h3 id="input-modal-title" class="font-bold text-lg text-slate-900 dark:text-white mb-4">Title</h3>
+        <input type="text" id="input-modal-value" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Enter value...">
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-900/50 px-5 py-3 flex justify-end space-x-2 border-t border-slate-100 dark:border-slate-700">
+        <button id="input-modal-cancel" class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+        <button id="input-modal-confirm" class="px-4 py-2 text-sm font-bold bg-primary-600 dark:bg-primary-800 text-white rounded-lg shadow hover:bg-primary-500">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Confirm Modal -->
+  <div id="confirm-modal" class="fixed inset-0 bg-slate-900/50 z-[300] hidden flex flex-col justify-center items-center p-4 transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden transition-colors duration-300">
+      <div class="p-5">
+        <h3 id="confirm-modal-title" class="font-bold text-lg text-slate-900 dark:text-white mb-2">Confirm Action</h3>
+        <p id="confirm-modal-message" class="text-sm text-slate-600 dark:text-slate-400 mb-4">Are you sure?</p>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-900/50 px-5 py-3 flex justify-end space-x-2 border-t border-slate-100 dark:border-slate-700">
+        <button id="confirm-modal-cancel" class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">Cancel</button>
+        <button id="confirm-modal-ok" class="px-4 py-2 text-sm font-bold bg-primary-600 dark:bg-primary-800 text-white rounded-lg shadow hover:bg-primary-500 dark:hover:bg-primary-700">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

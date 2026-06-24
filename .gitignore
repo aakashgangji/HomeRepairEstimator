@@ -1,0 +1,29 @@
+# User Specified
+Contest Briefing.docx
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node (future proofing)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Temporary files & patches
+*.patch
+*.orig
+*.txt
+*.log
+new_project_modal.js
+fix_dropdown.js
