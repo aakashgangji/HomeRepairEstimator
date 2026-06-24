@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setupLocationAutocomplete(inputEl, containerEl) {
     const suggestionsDiv = document.createElement('div');
-    suggestionsDiv.className = 'absolute left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 max-h-40 overflow-y-auto hidden';
+    suggestionsDiv.className = 'absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 max-h-40 overflow-y-auto hidden';
     containerEl.classList.add('relative');
     containerEl.appendChild(suggestionsDiv);
 
@@ -685,13 +685,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnEditLocation.addEventListener('click', () => {
       const project = store.getCurrentProject();
       if (!project) return;
-      showInputModal("Edit Project Location:", project.location || "", (newLocation) => {
-        if (newLocation !== project.location) {
-          showConfirmModal("Confirm Change", "Are you sure you want to update the location for this project?", () => {
-            store.updateProjectLocation(project.id, newLocation);
-            projectLocationDisplay.innerText = newLocation || "Add Location";
-          }, "Confirm");
-        }
+      showEditProjectModal(project, (newName, newLocation) => {
+        store.updateProjectDetails(project.id, newName, newLocation);
+        startProject();
       });
     });
   }

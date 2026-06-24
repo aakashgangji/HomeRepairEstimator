@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spark-estimator-v4';
+const CACHE_NAME = 'spark-estimator-v5';
 const urlsToCache = [
   './',
   './index.html',
