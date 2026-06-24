@@ -44,3 +44,4 @@ body {
 .custom-checkbox:checked + div svg {
   display: block;
 }
+button, input, a { touch-action: manipulation; }

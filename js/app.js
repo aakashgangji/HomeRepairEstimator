@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="w-8 h-8 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 transition-colors btn-decrement" data-id="${item.id}" data-room="${roomName}">
                   <i class="fas fa-minus text-xs"></i>
                 </button>
-                <input type="number" class="w-10 h-8 text-center text-sm font-bold bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-slate-800 dark:text-slate-100 qty-input" value="${qty}" min="0" data-id="${item.id}" data-room="${roomName}">
+                <input type="number" class="w-10 h-8 text-center text-base font-bold bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-slate-800 dark:text-slate-100 qty-input" value="${qty}" min="0" data-id="${item.id}" data-room="${roomName}">
                 <button class="w-8 h-8 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 transition-colors btn-increment" data-id="${item.id}" data-room="${roomName}">
                   <i class="fas fa-plus text-xs"></i>
                 </button>
