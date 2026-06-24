@@ -1343,32 +1343,43 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   photoInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const base64 = event.target.result;
-      const photoId = 'photo_' + Date.now();
-      
-      await localforage.setItem(photoId, base64);
-      
-      if (currentPhotoTarget) {
-        store.addItemPhoto(currentPhotoTarget.section, currentPhotoTarget.room, currentPhotoTarget.id, photoId);
-      } else {
-        const project = store.getCurrentProject();
-        if (!project.photos) project.photos = [];
-        project.photos.push(photoId);
-        store.saveState();
-      }
-      
-      // Auto-refresh viewer
-      openPhotosViewer(currentPhotoTarget ? currentPhotoTarget.section : null, 
-                       currentPhotoTarget ? currentPhotoTarget.room : null, 
-                       currentPhotoTarget ? currentPhotoTarget.id : null);
-      renderContent();
-    };
-    reader.readAsDataURL(file);
+    // Process all files concurrently
+    const promises = files.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          const base64 = event.target.result;
+          const photoId = 'photo_' + Date.now() + Math.random().toString(36).substr(2, 9);
+          
+          await localforage.setItem(photoId, base64);
+          resolve(photoId);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const photoIds = await Promise.all(promises);
+
+    if (currentPhotoTarget) {
+      photoIds.forEach(id => {
+        store.addItemPhoto(currentPhotoTarget.section, currentPhotoTarget.room, currentPhotoTarget.id, id);
+      });
+    } else {
+      const project = store.getCurrentProject();
+      if (!project.photos) project.photos = [];
+      project.photos.push(...photoIds);
+      store.saveState();
+    }
+    
+    // Auto-refresh viewer
+    openPhotosViewer(currentPhotoTarget ? currentPhotoTarget.section : null, 
+                     currentPhotoTarget ? currentPhotoTarget.room : null, 
+                     currentPhotoTarget ? currentPhotoTarget.id : null);
+    renderContent();
+    
     e.target.value = ''; // Reset input so same file can be chosen again
   });
 
