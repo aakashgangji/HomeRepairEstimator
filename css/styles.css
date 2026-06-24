@@ -45,3 +45,9 @@ body {
   display: block;
 }
 button, input, a { touch-action: manipulation; }
+
+@supports (-webkit-touch-callout: none) {
+  body {
+    height: -webkit-fill-available;
+  }
+}

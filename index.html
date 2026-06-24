@@ -2,7 +2,12 @@
 <html lang="en" class="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" id="viewport-meta">
+  <script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+      document.getElementById('viewport-meta').content += ', viewport-fit=cover';
+    }
+  </script>
   <title>Spark Homes Repair Estimator</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#f8fafc">
